@@ -5,7 +5,7 @@
 
   Using:
   HX711 Library and Sample Sketch they provided, then heavily modified.
-  Payload Program coded / libraries used from Juan Garcia of the Rocket Launchers
+  Payload Program coded / libraries used from Juan(Nick) Garcia of the Rocket Launchers
 
   Use:
   Reads voltage from the LoadCell, converts it to digital, using the HX711, and then uploads it to an
@@ -21,8 +21,8 @@
 
 #include "HX711.h"
 #include <SD.h> //SD card
-#include "Time.h"
-
+#include <Time.h>
+//#include <TimeLib.h>
 
 
 //HX711 pins used
@@ -43,6 +43,13 @@ char floatStr[9]; //SD card uses this
 //char dataStr[24];
 File myFile;      //SD card uses this
 float x; // used for whatever, mostly the getdata.
+
+//time section
+time_t t;
+double mil; // millis
+double mil2; // millis into seconds without any conversion loss
+   
+
 
 void setup() {
   Serial.begin(9600);
@@ -91,10 +98,15 @@ void loop() {
 
   scale.set_scale(calibration_factor); //Adjust to this calibration factor
   x = scale.get_units() * -9.81; //9.81 for the conversion to newtons
-
-  Serial.print("Reading: ");
+  //t = now();
+  mil = millis();
+  mil2 = mil / 1000;
+  
+  //Serial.print("Reading: ");
   Serial.print(x, 3); //3 decimal points
-  Serial.println(" newtons"); //new line at the end
+  Serial.print("  "); //new line at the end
+  Serial.println(mil2);
+
 
 
 /*
