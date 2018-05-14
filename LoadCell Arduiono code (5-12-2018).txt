@@ -1,0 +1,175 @@
+
+
+/*
+  Rocket Launchers Load Cell program 
+  Programmer: Luis Gutierrez
+
+  Using:
+  HX711 Library and Sample Sketch they provided, then heavily modified.
+  Payload Program coded / libraries used from Juan Garcia of the Rocket Launchers
+
+  Use:
+  Reads voltage from the LoadCell, converts it to digital, using the HX711, and then uploads it to an
+  SD CARD through an Arduino and its SD shield
+  
+  Requirements:
+  Arduino SD card Shield 
+  HX711 Amplifier.
+  
+
+*/
+
+#include "HX711.h"
+#include <SD.h> //SD card
+#include "Time.h"
+
+
+
+//HX711 pins used
+#define DOUT  3
+#define CLK  2
+
+// SD card
+#define DS1307_I2C_ADDRESS 0x68
+#define TIME_MSG_LEN 11
+#define TIME_HEADER 'T'
+
+HX711 scale(DOUT, CLK);
+
+//global variables
+char floatStr[9]; //SD card uses this
+char dataStr[24];
+File myFile;      //SD card uses this
+int hours = 0;    //Timestamps
+int minutes = 0;
+int seconds = 0;
+
+//LoadCell Calibration using HX711
+float calibration_factor = -7200; //-7050 worked for my 440lb max scale setup // -8900 is good for clamp // -1300 worked for the stand
+double MyArray[10];
+int Counter = 0;
+double Total = 0;
+
+
+void updateTime()
+{
+    seconds = seconds + 1;
+    if(seconds == 60)
+    {
+        minutes = minutes + 1;
+        seconds = 0;
+
+        if(minutes == 60)
+        {
+            hours = hours + 1;
+            minutes = 0;
+        }
+    }
+}
+
+void setup() {
+  Serial.begin(9600);
+  /*Serial.println("HX711 calibration sketch");
+  Serial.println("Remove all weight from scale");
+  Serial.println("After readings begin, place known weight on scale");
+  Serial.println("Press + or a to increase calibration factor");
+  Serial.println("Press - or z to decrease calibration factor");
+*/
+
+//////////////////////////// SD Card code ////////////////////////////////
+    Serial.println("Initializing SD card...");
+
+  
+    // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
+    // Note that even if it's not used as the CS pin, the hardware SS pin
+    // (10 on most Arduino boards, 53 on the Mega) must be left as an output
+    // or the SD library functions will not work.
+    pinMode(10, OUTPUT);
+
+    if (!SD.begin(10))
+    {
+        Serial.print("SD card initialization failed!");
+        return;
+    }
+
+    Serial.println("initialization done.");
+    floatStr[0] = '\0';
+    analogReference(INTERNAL);
+
+////////////////////////////////////////////////////////////////////////
+    
+
+  scale.set_scale();
+  scale.tare(); //Reset the scale to z0
+
+  long zero_factor = scale.read_average(10); //Get a baseline reading
+  Serial.print("Zero factor: "); //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
+  Serial.println(zero_factor);
+
+
+
+
+  
+}
+
+void loop() {
+
+  scale.set_scale(calibration_factor); //Adjust to this calibration factor
+
+  Serial.print("Reading: ");
+  Serial.print(scale.get_units() * -9.81); //*9.81 for newtons
+  Serial.print(" newtons"); //Change this for different units, make sure you convert.
+  Serial.println();
+  /*Serial.print("                                   calibration_factor: ");
+  Serial.print(calibration_factor);
+  Serial.println();
+  */
+
+
+  
+/*
+
+  if (Counter >= 10)
+  {
+    Counter = 0;
+    Total = 0;
+    
+    for (int i = 0; i < 10; i++)
+    {
+      Total += MyArray[i];
+    }
+
+    Total = Total / 10;
+    
+    Serial.print("Reading: ");
+  Serial.print(Total, 1); //*9.81 for newtons
+  Serial.print(" newtons"); //Change this to kg and re-adjust the calibration factor if you follow SI units like a sane person
+  Serial.print(" calibration_factor: ");
+  Serial.print(calibration_factor);
+  Serial.println();
+  }
+
+
+  
+  else 
+  {
+    MyArray[Counter] = scale.get_units() * -9.81;
+    Counter++;
+  }
+  */
+
+
+/*
+  if(Serial.available())
+  {
+    char temp = Serial.read();
+    if(temp == '+' || temp == 'a')
+      calibration_factor += 100;
+    else if(temp == '-' || temp == 'z')
+      calibration_factor -= 100;
+  }
+
+*/
+  
+}
+
