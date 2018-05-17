@@ -16,13 +16,12 @@
   HX711 Amplifier.
   Patience with the LoadCell
   
-
 */
 
+//Libraries
 #include "HX711.h"
 #include <SD.h> //SD card
 #include <Time.h>
-//#include <TimeLib.h>
 
 
 //HX711 pins used
@@ -40,7 +39,6 @@ float calibration_factor = -12300; //-7050 default, -12300 for tightened bolt on
 
 //global variables
 char floatStr[9]; //SD card uses this
-//char dataStr[24];
 File myFile;      //SD card uses this
 float x; // used for whatever, mostly the getdata.
 
@@ -48,25 +46,16 @@ float x; // used for whatever, mostly the getdata.
 time_t t;
 double mil; // millis
 double mil2; // millis into seconds without any conversion loss
-   
+
 
 
 void setup() {
   Serial.begin(9600);
-  /*
-  Serial.println("HX711 calibration sketch");
-  Serial.println("Remove all weight from scale");
-  Serial.println("After readings begin, place known weight on scale");
-  Serial.println("Press + or a to increase calibration factor");
-  Serial.println("Press - or z to decrease calibration factor");
-*/
 
   scale.set_scale();
   scale.tare(); //Reset the scale to 0
 
   long zero_factor = scale.read_average(); //Get a baseline reading, must place this first after the Serial.begin, or it will not work ¯\_(ツ)_/¯
-  //Serial.print("Zero factor: "); //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
-  //Serial.println(zero_factor);
 
   
 //////////////////////////// SD Card code ////////////////////////////////
@@ -91,8 +80,9 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////
 
-  
 }
+
+
 
 void loop() {
 
@@ -107,11 +97,8 @@ void loop() {
   Serial.print("\t"); //new line at the end
   Serial.print(mil2);
 
-
-/*
-
-    // open the file. note that only one file can be open at a time,
-    // so you have to close this one before opening another.
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
   myFile = SD.open("test.txt", FILE_WRITE);
 
 
@@ -121,10 +108,6 @@ void loop() {
       myFile.print(x, 3); //3 decimal points
       myFile.print("\t"); //new line at the end 
       myFile.println(mil2);
-     
-
-
-      
   }
   else
   {
@@ -132,32 +115,7 @@ void loop() {
       Serial.println("error opening test.txt");
       return;
   }
-
-
+  
     myFile.close();
-
-
-*/
-
-
-
-
-
-  
-  Serial.print("            calibration_factor: ");
-  Serial.println(calibration_factor);
-
-
-
-  
-  if(Serial.available())
-  {
-    char temp = Serial.read();
-    if(temp == '+' || temp == 'a')
-      calibration_factor += 100;
-    else if(temp == '-' || temp == 'z')
-      calibration_factor -= 100;
-  }
-  
 }
 
