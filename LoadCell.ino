@@ -36,7 +36,7 @@
 
 HX711 scale(DOUT, CLK);
 
-float calibration_factor = -12300; //-7050 default, -12300 for tightened bolt on stand
+float calibration_factor = -12300; //-7050 default, -12300 for tightened bolt on stand + hook
 
 //global variables
 char floatStr[9]; //SD card uses this
@@ -104,12 +104,12 @@ void loop() {
   
   //Serial.print("Reading: ");
   Serial.print(x, 3); //3 decimal points
-  Serial.print("  "); //new line at the end
-  Serial.println(mil2);
-
+  Serial.print("\t"); //new line at the end
+  Serial.print(mil2);
 
 
 /*
+
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
   myFile = SD.open("test.txt", FILE_WRITE);
@@ -118,13 +118,12 @@ void loop() {
   //if the file opened okay, write to it:
   if (myFile)
   {
-    
-      //myFile.print("Reading: ");
-      myFile.println(x, 3); //the reading from the loadcell
-      //myFile.print(" newtons"); //Change this for different units, make sure you convert.
+      myFile.print(x, 3); //3 decimal points
+      myFile.print("\t"); //new line at the end 
+      myFile.println(mil2);
      
 
-      printf ("Number of hours since 1970 Jan 1st is %ld \n", seconds/3600);
+
       
   }
   else
@@ -137,28 +136,28 @@ void loop() {
 
     myFile.close();
 
-*/
 
+*/
 
 
 
 
 
   
-/*Serial.print(" calibration_factor: ");
-  Serial.print(calibration_factor);
-  Serial.println();
-*/
+  Serial.print("            calibration_factor: ");
+  Serial.println(calibration_factor);
 
-  /*
+
+
+  
   if(Serial.available())
   {
     char temp = Serial.read();
     if(temp == '+' || temp == 'a')
-      calibration_factor += 10;
+      calibration_factor += 100;
     else if(temp == '-' || temp == 'z')
-      calibration_factor -= 10;
+      calibration_factor -= 100;
   }
-  */
+  
 }
 
